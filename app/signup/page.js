@@ -1,7 +1,45 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
+
+  const router = useRouter()
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: ""
+  })
+  // const [loading, setLoading] = useState(false)
+  // const [error, setError] = useState("")
+
+
+  const handleChange = (e) =>{
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    })
+  }
+
+  const handleSubmit = async (e) =>{
+    e.preventDefault()
+    const res = await fetch("/api/auth/signup",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    })
+
+    const data = await res.json()
+    if(res.ok){
+      router.push("/login")
+    }
+  }
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
       {/* Card */}
@@ -25,6 +63,7 @@ const Signup = () => {
             </label>
             <input
               id="name"
+              onChange={handleChange}
               type="text"
               placeholder="Enter your name"
               className="w-full px-4 py-3 rounded-lg bg-black/40 text-white border border-gray-600 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -38,6 +77,7 @@ const Signup = () => {
             </label>
             <input
               id="email"
+              onChange={handleChange}
               type="email"
               placeholder="Enter your email"
               className="w-full px-4 py-3 rounded-lg bg-black/40 text-white border border-gray-600 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -54,6 +94,7 @@ const Signup = () => {
             </label>
             <input
               id="password"
+              onChange={handleChange}
               type="password"
               placeholder="Enter your password"
               className="w-full px-4 py-3 rounded-lg bg-black/40 text-white border border-gray-600 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -62,7 +103,9 @@ const Signup = () => {
 
           {/* Button */}
           <div className="flex justify-center">
-            <button className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
+            <button 
+            onClick={handleSubmit}
+            className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
               Sign Up
             </button>
           </div>
@@ -84,3 +127,4 @@ const Signup = () => {
 };
 
 export default Signup;
+

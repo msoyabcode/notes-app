@@ -1,55 +1,69 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 
-const CreateNote = () => {
+const EditNote = () => {
   const router = useRouter();
+  const { id } = useParams();
 
-  const [createNote, setCreateNote] = useState({
+  const [formData, setFormData] = useState({
     title: "",
-    content: "",
-  });
+    content: ""
+  })
 
-  const handleChange = (e) => {
-    setCreateNote({ ...createNote, [e.target.id]: e.target.value });
-  };
+  useEffect(()=>{
+    const fetchNote = async () =>{
+        const res = await fetch(`/api/notes/${id}`)
+            const data = await res.json()
+            setFormData({
+                title: data.note.title,
+                content: data.note.content
+            })
+    }
+    fetchNote()
+  },[])
+
+  const handleChange = (e) =>{
+    setFormData({...formData, [e.target.id]: e.target.value})
+  }
 
   const handleSubmit = async () =>{
-    const res = await fetch("http://localhost:3000/api/notes",{
-        method: "POST",
+    console.log("submitting", formData)
+    const res = await fetch(`/api/notes/${id}`,{
+        method: "PUT",
         headers:{
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(createNote)
+        body: JSON.stringify(formData)
     })
     const data = await res.json()
-    console.log(data)
+    console.log("response", data)
     if(res.ok){
         router.push("/dashboard")
     }
-
   }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-6 py-8">
-      <div className="w-full max-w-md md:max-w-lg bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl  p-8">
+      <div className="w-full max-w-md md:max-w-lg bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8">
+
         {/* Title */}
         <h1 className="text-3xl font-bold text-white text-center mb-8">
-          Create Note
+          Edit Note
         </h1>
 
         {/* Form */}
         <div className="flex flex-col gap-6">
+
           {/* Title Input */}
           <div>
-            <label
-              htmlFor="title"
-              className="block text-gray-200 text-sm font-medium mb-2"
-            >
+            <label htmlFor="title" className="block text-gray-200 text-sm font-medium mb-2">
               Title
             </label>
             <input
-              onChange={handleChange}
+            value={formData.title}
+            onChange={handleChange}
               type="text"
               id="title"
               placeholder="Note title..."
@@ -59,14 +73,12 @@ const CreateNote = () => {
 
           {/* Content Textarea */}
           <div>
-            <label
-              htmlFor="content"
-              className="block text-gray-200 text-sm font-medium mb-2"
-            >
+            <label htmlFor="content" className="block text-gray-200 text-sm font-medium mb-2">
               Content
             </label>
             <textarea
-              onChange={handleChange}
+            value={formData.content}
+            onChange={handleChange}
               id="content"
               rows={6}
               placeholder="Write your note here..."
@@ -74,17 +86,16 @@ const CreateNote = () => {
             />
           </div>
 
-          {/* Button */}
-          <div className="flex justify-center mt-2">
-            <button 
-            onClick={handleSubmit}
-            className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
-              Save Note
+          {/* Save Button */}
+          <div className="flex justify-center">
+            <button
+            onClick={handleSubmit} className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
+              Save Changes
             </button>
           </div>
 
-          {/* reverse button */}
-          <div className="flex justify-center mt-6">
+          {/* Back Button */}
+          <div className="flex justify-center">
             <button
               onClick={() => router.push("/dashboard")}
               className="w-1/2 py-3 rounded-lg border border-gray-500 text-gray-300 font-semibold hover:bg-white/10 active:scale-95 transition-all duration-200"
@@ -92,10 +103,11 @@ const CreateNote = () => {
               ← Back to Dashboard
             </button>
           </div>
-        </div> 
+
+        </div>
       </div>
     </div>
   );
 };
 
-export default CreateNote;
+export default EditNote;

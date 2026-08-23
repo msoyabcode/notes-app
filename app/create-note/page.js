@@ -10,12 +10,18 @@ const CreateNote = () => {
     content: "",
   });
 
+  const [error, setError] = useState("")
+
   const handleChange = (e) => {
     setCreateNote({ ...createNote, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async () =>{
-    const res = await fetch("http://localhost:3000/api/notes",{
+    if(!createNote.title || !createNote.content){
+      setError("Please fill all fields!")
+      return
+    }
+    const res = await fetch("/api/notes",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
@@ -74,6 +80,9 @@ const CreateNote = () => {
             />
           </div>
 
+          {error && (
+            <p className="text-red-400 text-sm text-center">{error}</p>
+          )}
           {/* Button */}
           <div className="flex justify-center mt-2">
             <button 

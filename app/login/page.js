@@ -12,6 +12,9 @@ const Login = () => {
     password: ""
   })
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
   const handleChange = (e) =>{
     setFormData({...formData,
       [e.target.id]: e.target.value
@@ -20,6 +23,7 @@ const Login = () => {
   }
 
   const handleSubmit = async (e) =>{
+    setLoading(true)
     e.preventDefault()
     const res = await fetch("/api/auth/login",{
       method: 'POST',
@@ -29,8 +33,12 @@ const Login = () => {
       body: JSON.stringify(formData)
     })
     if(res.ok){
-    router.push("/dashboard")
+      router.push("/dashboard")
+    }else{
+      const data = await res.json()
+      setError(data.message)
     }
+    setLoading(false)
   }
   
   return (
@@ -81,12 +89,15 @@ const Login = () => {
             </p>
           </div>
 
+          {/* error message */}
+          {error && (<p className="text-red-400 text-sm text-center">{error}</p>)}
+
           {/* Button */}
           <div className="flex justify-center mb-5">
-          <button
+          <button disabled={loading}
           onClick={handleSubmit}
            className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
-            Login
+            {loading? "Logging in...": "Login"}
           </button>
           </div>
 

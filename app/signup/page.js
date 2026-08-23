@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+
 const Signup = () => {
 
   const router = useRouter()
@@ -12,9 +13,9 @@ const Signup = () => {
     email: "",
     password: ""
   })
-  // const [loading, setLoading] = useState(false)
-  // const [error, setError] = useState("")
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (e) =>{
     setFormData({
@@ -24,6 +25,7 @@ const Signup = () => {
   }
 
   const handleSubmit = async (e) =>{
+    setLoading(true)
     e.preventDefault()
     const res = await fetch("/api/auth/signup",{
       method: "POST",
@@ -33,10 +35,13 @@ const Signup = () => {
       body: JSON.stringify(formData)
     })
 
-    const data = await res.json()
     if(res.ok){
       router.push("/login")
+    }else{
+      const data = await res.json()
+      setError(data.message)
     }
+    setLoading(false)
   }
 
 
@@ -101,12 +106,16 @@ const Signup = () => {
             />
           </div>
 
+          {error && (
+            <p className="text-red-400 text-sm text-center ">{error}</p>
+          ) }
+
           {/* Button */}
           <div className="flex justify-center">
-            <button 
+            <button disabled={loading}
             onClick={handleSubmit}
             className="w-1/2 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold transition-all duration-200 shadow-lg">
-              Sign Up
+              {loading? "Singning up...": "Sign Up"}
             </button>
           </div>
         </div>

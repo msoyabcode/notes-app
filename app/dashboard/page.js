@@ -107,3 +107,25 @@ export default Dashboard;
 
 
 
+// /dashboard khula
+//       ↓
+// Middleware pehle chala
+//       ↓
+// Cookie mein token check kiya
+//       ↓
+// Token nahi → /login
+// Token hai → Dashboard load hua
+//       ↓
+// Component render hua
+//       ↓
+// useEffect chala — ek baar
+//       ↓
+// fetchNotes() call hui
+//       ↓
+// GET /api/notes → Token verify → Notes fetch
+//       ↓
+// setNotes(data.notes)
+//       ↓
+// Cards render hue
+//       ↓
+// User notes dekh sakta hai!
